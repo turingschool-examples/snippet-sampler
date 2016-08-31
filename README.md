@@ -95,7 +95,9 @@ In `public/index.html`, let's add some markup.
 </html>
 ```
 
-Let's also have give it some style.
+Let's also have give it some style. We'll use some [CSS variables][], for fun.
+
+[CSS variables]: https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_variables
 
 ```css
 :root {
@@ -217,6 +219,27 @@ module.exports = {
 };
 ```
 
+The last bit of that code is the same as doing the following:
+
+```js
+module.exports = {
+  $snippetsSection: $snippetsSection,
+  $newSnippetForm: $newSnippetForm,
+  $newSnippetTitle: $newSnippetTitle,
+  $newSnippetCode: $newSnippetCode,
+  $newSnippetSubmit: $newSnippetSubmit
+};
+```
+
+For example, if you did:
+
+```js
+const a = 1;
+const object = { a };
+```
+
+You'd end up with `object` being `{ a: 1 }`. It's just a shorthand.
+
 ### Validating the Form
 
 Create a new file called `lib/validate-input-fields.js` and add the following content:
@@ -233,6 +256,17 @@ module.exports = () => {
   $newSnippetSubmit.attr('disabled', !bothFieldsHaveContent);
 };
 ```
+
+That first bit is the inverse of what we just talked about. It's the same as doing.
+
+```js
+const elements = = require('./elements');
+const $newSnippetTitle = elements.$newSnippetTitle;
+const $newSnippetCode = elements.$newSnippetCode;
+const $newSnippetSubmit = elements.$newSnippetSubmit;
+```
+
+Again, it's a shorthand.
 
 ### Rendering Snippets
 
