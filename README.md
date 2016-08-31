@@ -294,3 +294,5 @@ $newSnippetForm.on('submit', (e) => {
   $newSnippetCode.val('');
 });
 ```
+
+At this point, we should have a basic UI that works—albeit, without Firebase installed.
