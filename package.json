@@ -4,7 +4,7 @@
   "description": "A place to share your dank webpack configsurations.",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server",
+    "start": "webpack-dev-server --inline --hot",
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "escape-html": "^1.0.3",
     "firebase": "^3.3.0",
     "firebase-tools": "^3.0.7",
     "jquery": "^3.1.0",
