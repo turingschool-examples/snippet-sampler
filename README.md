@@ -78,12 +78,14 @@ In `public/index.html`, let's add some markup.
 
     <header>
       <h1>Snippet Sampler</h1>
+      <button id="sign-in">Sign In</button>
+      <div id="user-info"></div>
     </header>
 
     <section id="new-snippet">
       <form id="new-snippet--form">
         <input type="text" placeholder="Title" id="new-snippet--title">
-        <div contenteditable id="new-snippet--code"></div>
+        <div contenteditable placeholder="Code" id="new-snippet--code"></div>
         <input type="submit" id="new-snippet--submit" disabled>
       </form>
     </section>
@@ -119,6 +121,27 @@ body {
 
 header {
   text-align: center;
+}
+
+#sign-in {
+  display: block;
+  margin: 1em auto;
+  width: 200px;
+  padding: 10px;
+  border: 4px solid var(--hot-pink);
+  background-color: var(--hot-pink);
+}
+
+#sign-in:hover {
+  background-color: var(--orange);
+}
+
+#sign-in:active {
+  border-color: var(--light-green);
+}
+
+#sign-in:focus {
+  outline: none;
 }
 
 #new-snippet--title, #new-snippet--code, #new-snippet--submit {
@@ -209,13 +232,16 @@ const $newSnippetForm = $('#new-snippet--form');
 const $newSnippetTitle = $('#new-snippet--title');
 const $newSnippetCode = $('#new-snippet--code');
 const $newSnippetSubmit = $('#new-snippet--submit');
+const $signInButton = $('#sign-in');
 
 module.exports = {
   $snippetsSection,
   $newSnippetForm,
   $newSnippetTitle,
   $newSnippetCode,
-  $newSnippetSubmit
+  $newSnippetSubmit,
+  $signInButton,
+  $userInfo
 };
 ```
 
@@ -227,7 +253,9 @@ module.exports = {
   $newSnippetForm: $newSnippetForm,
   $newSnippetTitle: $newSnippetTitle,
   $newSnippetCode: $newSnippetCode,
-  $newSnippetSubmit: $newSnippetSubmit
+  $newSnippetSubmit: $newSnippetSubmit,
+  $signInButton: $signInButton,
+  $userInfo: $userInfo
 };
 ```
 
@@ -302,7 +330,9 @@ const {
   $newSnippetForm,
   $newSnippetTitle,
   $newSnippetCode,
-  $newSnippetSubmit
+  $newSnippetSubmit,
+  $signInButton,
+  $userInfo
 } = require('./elements');
 ```
 
@@ -330,3 +360,25 @@ $newSnippetForm.on('submit', (e) => {
 ```
 
 At this point, we should have a basic UI that works—albeit, without Firebase installed.
+
+## Setting Up Authentication in Firebase
+
+We'll start by setting up Google authentication.
+
+Go into your Firebase console, head over to the "Auth" menu in the sidebar and turn on Google authentication.
+
+![Google authentication](images/google-auth.gif)
+
+In `lib/index.js`, we'll add the following:
+
+```js
+const provider = new firebase.auth.GoogleAuthProvider();
+```
+
+I put the above after my `require` statements. Now, that we're authenticating the user. We don't want to show the form if the user is not authenticated.
+
+```css
+#new-snippet--form {
+  display: none;
+}
+```
