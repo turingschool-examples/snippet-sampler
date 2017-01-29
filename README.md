@@ -447,5 +447,65 @@ This block of code is responsible for several changes in our UI:
 * Toggling the display of the sign-in button and the snippet formed based on whether or not a `currentUser` exists.
 * Displaying authentication text in our `$userInfo` element if there is a `currentUser`
 
+## Data Persistence with Firebase Database
+So far we've only kinda sorta 'pretended' to add real snippet data to our application, by rendering new snippet details to the DOM on our form submit. Firebase contains several different tools for our applications, one of which is a real time database we can use to persist our application data.
+
+We can add snippets to our Firebase database by creating a reference to it in our `index.js` file:
 
 
+```javascript
+const snippetsReference = firebase.database().ref().child('snippets');
+```
+
+If this reference doesn't exist yet, (e.g. we have no snippets key in our database), Firebase will create it for us automatically. If we do have snippets in our database, this code will help us read from that object in our database.
+
+If we want to display all the snippets pulled from our database, we can access these snippet objects with the following code:
+
+```javascript
+snippetsReference.on('value', (snapshot) => {
+  const snippetsValue = snapshot.val();
+  const snippetKeys = Object.keys(snippetsValue);
+
+  snippetKeys.forEach(snippet => {
+    let snip = snippetsValue[snippet];
+    $snippetsSection.append(renderSnippet(snip.title, snip.code));
+  })
+});
+```
+
+One important thing to note is that in order to work with our data as a JSON object, we must call `snapshot.val()` in order to get the appropriate keys to work with. Try `console.logging` the values of `snapshot`, `snippetsValue`, and `snippetKeys` to explore what your data structure looks like after you've added some snippets to the database...which we'll do right now!
+
+Let's create a new function, `createSnippet`:
+
+```javascript
+const createSnippet = (user, title, code) => {
+  const { uid, displayName } = user;
+
+  const snippet = {
+    uid: uid,
+    author: displayName,
+    title,
+    code
+  };
+
+  snippetsReference.push(snippet);
+}
+```
+
+This will push a new snippet object into our database. Let's now use this function in our submit handler rather than simply appending the values to the DOM:
+
+```javascript
+$newSnippetForm.on('submit', (e) => {
+  e.preventDefault();
+
+  const title = $newSnippetTitle.val();
+  const code = $newSnippetCode.text();
+
+  if (currentUser) createSnippet(currentUser, title, code);
+
+  $newSnippetTitle.val('');
+  $newSnippetCode.text('');
+});
+```
+
+You should now be able to add snippets to your Firebase database, and see that they have persisted on page refresh and are all displayed in the DOM. 
