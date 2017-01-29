@@ -367,11 +367,12 @@ We'll start by setting up Google authentication.
 
 Go into your Firebase console, head over to the "Auth" menu in the sidebar and turn on Google authentication.
 
-![Google authentication](images/google-auth.gif)
+![Google authentication](images/google-auth.png)
 
 In `lib/index.js`, we'll add the following:
 
 ```js
+let currentUser;
 const provider = new firebase.auth.GoogleAuthProvider();
 ```
 
@@ -383,6 +384,68 @@ I put the above after my `require` statements. Now, that we're authenticating th
 }
 ```
 
----
+Let's instead add a sign-in button to display. In `index.html`, add the following to your header:
 
-(We'll take it from here as a group!)
+```html
+  <header>
+    <h1>Snippet Sampler</h1>
+    <button id="sign-in">Sign In</button>
+    <div id="user-info"></div>
+  </header>
+```
+
+Let's also add these new elements to `lib/elements.js`:
+
+```javascript
+const $signInButton = $('#sign-in');
+const $userInfo = $('#user-info');
+```
+
+Don't forget to export them in your `module.exports` as well!
+
+```javascript
+module.exports = {
+  $snippetsSection,
+  $newSnippetForm,
+  $newSnippetTitle,
+  $newSnippetCode,
+  $newSnippetSubmit,
+  $signInButton,
+  $userInfo
+};
+```
+
+Next we need to wire up our `$signInButton` element to actually authenticate the user. If we go back to `index.js`, we can create an event handler that will call our firebase authentication method like so:
+
+```javascript
+$signInButton.on('click', () => {
+  firebase.auth().signInWithPopup(provider);
+});
+```
+
+You'll now notice that Firebase opens a new pop-up window with your google account listed as an option for sign-in. While this technically completes the authentication process, we'd like to indicate the logged-in status to our users. We'll use our newly created `$userInfo` element to display a 'Signed in as...' message when a user is authenticated. 
+
+Below our click handler for the sign-in button, in `index.js`, we can listen for our Firebase authentication with `firebase.auth().onAuthStateChanged()`:
+
+```javascript
+firebase.auth().onAuthStateChanged((user) => {
+  currentUser = user;
+  $signInButton.toggle(!currentUser);
+  $newSnippetForm.toggle(!!currentUser);
+
+  if (currentUser) {
+    const { displayName, email } = currentUser;
+    $userInfo.text(`Sign in as ${displayName} (${email}).`);
+  } else {
+    $userInfo.text('');
+  }
+});
+```
+
+This block of code is responsible for several changes in our UI: 
+
+* Toggling the display of the sign-in button and the snippet formed based on whether or not a `currentUser` exists.
+* Displaying authentication text in our `$userInfo` element if there is a `currentUser`
+
+
+
